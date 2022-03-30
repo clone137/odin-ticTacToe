@@ -11,17 +11,6 @@ const GameBoard = (() => {
 
   let board = ['', '', '', '', '', '', '', '', ''];
 
-  const winningRows = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-
   function _addPlayers() {
     const player1 = playerFactory('player1', 'close');
     const player2 = playerFactory('player2', 'circle');
@@ -65,9 +54,45 @@ const GameBoard = (() => {
         cell.removeEventListener('mouseleave', _handleMouseLeave);
         cell.removeEventListener('click', _handleClick);
         board[index] = players[activePlayer].shape;
-        console.log(board);
+
+        const winningMove = _checkForWin(players[activePlayer].shape);
+        if (winningMove) {
+          console.log(`${activePlayer} wins with winning move: ${winningMove}`);
+          winningMove.forEach((winningCell) => {
+            cells[winningCell].classList.add('win');
+          });
+        }
         activePlayer = activePlayer === 0 ? 1 : 0;
       }
+    }
+
+    function _checkForWin(shape) {
+      // check rows
+      for (let i = 0; i < 3; i++) {
+        console.log(`found a row: ${i}`);
+        if (
+          board[i * 3] == shape &&
+          board[i * 3 + 1] == shape &&
+          board[i * 3 + 2] == shape
+        )
+          return [i * 3, i * 3 + 1, i * 3 + 2];
+      }
+
+      // check columns
+      for (let i = 0; i < 3; i++) {
+        console.log(`found a column: ${i}`);
+        if (board[i] == shape && board[i + 3] == shape && board[i + 6] == shape)
+          return [i, i + 3, i + 6];
+      }
+
+      // check diagonals
+      if (board[0] == shape && board[4] == shape && board[8] == shape)
+        return [0, 4, 8];
+
+      if (board[2] == shape && board[4] == shape && board[6] == shape)
+        return [2, 4, 6];
+
+      return false;
     }
   });
 })();
