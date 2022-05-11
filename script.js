@@ -8,6 +8,7 @@ const playerFactory = (name, shape) => {
 
 const GameBoard = (() => {
   const cells = Array.from(document.querySelectorAll('.cell'));
+  const statusMessage = document.querySelector('#statusMessage');
 
   let board = ['', '', '', '', '', '', '', '', ''];
 
@@ -19,6 +20,7 @@ const GameBoard = (() => {
 
   const players = _addPlayers();
   let activePlayer = 0;
+  let gameOver = 0;
 
   cells.forEach((cell, index) => {
     // add handlers for mouse events around the board
@@ -30,7 +32,7 @@ const GameBoard = (() => {
 
     function _handleMouseEnter(e) {
       e.preventDefault();
-      if (!e.target.classList.contains('set')) {
+      if (!e.target.classList.contains('set') && gameOver !== 1) {
         e.target.innerHTML = `<span class="material-icons-outlined md-96">${players[activePlayer].shape}</span>`;
         e.target.classList.add('hover');
       }
@@ -38,7 +40,7 @@ const GameBoard = (() => {
 
     function _handleMouseLeave(e) {
       e.preventDefault();
-      if (!e.target.classList.contains('set')) {
+      if (!e.target.classList.contains('set') && gameOver !== 1) {
         e.target.innerHTML = '';
         e.target.classList.remove('hover');
       }
@@ -47,7 +49,7 @@ const GameBoard = (() => {
     function _handleClick(e) {
       e.preventDefault();
       // if (!e.target.classList.contains('set')) {
-      if (!cell.classList.contains('set')) {
+      if (!cell.classList.contains('set') && gameOver !== 1) {
         cell.classList.add('set');
         cell.classList.remove('hover');
         cell.removeEventListener('mouseenter', _handleMouseEnter);
@@ -57,10 +59,27 @@ const GameBoard = (() => {
 
         const winningMove = _checkForWin(players[activePlayer].shape);
         if (winningMove) {
-          console.log(`${activePlayer} wins with winning move: ${winningMove}`);
+          statusMessage.innerText = `Player ${
+            activePlayer + 1
+          } wins with winning move: ${winningMove}`;
+          console.log(
+            `Player ${activePlayer + 1} wins with winning move: ${winningMove}`
+          );
+          gameOver = 1;
           winningMove.forEach((winningCell) => {
             cells[winningCell].classList.add('win');
           });
+          cells.forEach((cell) => {
+            cell.removeEventListener('mouseenter', _handleMouseEnter);
+            cell.removeEventListener('mouseleave', _handleMouseLeave);
+            cell.removeEventListener('click', _handleClick);
+            cell.style.cursor = 'default';
+          });
+        }
+
+        if (!winningMove && !board.includes('')) {
+          statusMessage.innerText = `no one wins, it's a tie!`;
+          console.log(`no one wins, it's a tie!`);
         }
         activePlayer = activePlayer === 0 ? 1 : 0;
       }
@@ -69,7 +88,6 @@ const GameBoard = (() => {
     function _checkForWin(shape) {
       // check rows
       for (let i = 0; i < 3; i++) {
-        console.log(`found a row: ${i}`);
         if (
           board[i * 3] == shape &&
           board[i * 3 + 1] == shape &&
@@ -80,7 +98,6 @@ const GameBoard = (() => {
 
       // check columns
       for (let i = 0; i < 3; i++) {
-        console.log(`found a column: ${i}`);
         if (board[i] == shape && board[i + 3] == shape && board[i + 6] == shape)
           return [i, i + 3, i + 6];
       }
