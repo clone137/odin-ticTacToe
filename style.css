@@ -132,7 +132,7 @@ div > .set {
 
 .win {
   /* background-color: rgba(0, 255, 0, 0.3); */
-  background-color: rgba(0, 95, 115, 0.3);
+  background-color: rgba(14, 165, 255, 0.7);
 }
 
 .top {
@@ -149,4 +149,11 @@ div > .set {
 
 .right {
   border-right: 0;
+}
+
+a {
+  text-decoration: none;
+  color: #039be5;
+  -webkit-tap-highlight-color: transparent;
+  background-color: transparent;
 }
